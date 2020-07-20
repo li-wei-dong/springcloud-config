@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 //fengin日志打印
 @Configuration
 public class FeigenConfig {
+
     @Bean
     Logger.Level feignLonggerLeve(){
         return Logger.Level.FULL;
