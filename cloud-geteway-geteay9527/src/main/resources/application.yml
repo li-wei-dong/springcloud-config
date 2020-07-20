@@ -1,0 +1,59 @@
+server:
+  port: 9527
+
+
+test:
+#  uri: http://localhost:8001
+  uri: lb://CLOUD-PAYMENT-SERVICE   #lb代表从注册中心获取服务
+
+spring:
+  application:
+    name: cloud-geteway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          lower-case-service-id: true    #开启注册中心
+      routes:
+        - id: cloud-geteway-9527      #路由id 唯一，建议配合服务名
+          uri: ${test.uri}   # uri以lb://开头（lb代表从注册中心获取服务），后面接的就是你需要转发到的服务名称
+          predicates:
+            - Path=/payment/get/**       #断言
+
+        - id: cloud-geteway-2      #路由id 唯一，建议配合服务名
+          uri: ${test.uri} # uri以lb://开头（lb代表从注册中心获取服务），后面接的就是你需要转发到的服务名称
+          predicates:
+            - Path=/payment/lb/**       #断言
+
+
+
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/test?serverTimezone=UTC&useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&useConfigs=maxPerformance&useSSL=false
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.jdbc.Driver
+
+
+
+
+
+
+
+
+
+
+mybatis:
+  mapper-locations: classpath*:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+  type-aliases-package: com.atguigu.springcloud.entities
+
+
+eureka:
+  client:
+    service-url:
+      fetch-registry: true  # false表示自己就是注册中心。我的职责就是维护服务实例，并不需要去检索服务
+      register-with-eureka: true   # false表示自己不需要向注册中心注册自己
+      #      defaultZone: http://eureka7001.com:7001/eureka      # 设置与Eureka Server交互的地址查询服务和注册服务都需要依赖这个地址(单机版)
+      defaultZone: http://eureka7001.com:7001/eureka/,http://eureka7002.com:7002/eureka/   # 集群版
+
